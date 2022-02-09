@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "de.throwstnt.developing.labymod.cvc.implemented.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "example.refmap.json",
+  "verbose": false,
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "NetworkPlayerMixin",
+    "ClientPlayerEntityMixin"
+  ]
+}
