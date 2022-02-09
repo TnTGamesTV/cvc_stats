@@ -1,5 +1,6 @@
 package de.throwstnt.developing.labymod.cvc.api.events.player;
 
+import de.throwstnt.developing.labymod.cvc.api.data.stats.OtherType;
 import de.throwstnt.developing.labymod.cvc.api.data.stats.WeaponType;
 import de.throwstnt.developing.labymod.cvc.api.game.CvcPlayer;
 
@@ -8,17 +9,22 @@ import de.throwstnt.developing.labymod.cvc.api.game.CvcPlayer;
  */
 public class CvcPlayerKillEvent extends CvcPlayerEvent {
 
-    private WeaponType weaponType;
-    private boolean isHeadshot;
-    private long atSecondsAfterRoundStart;
+    private CvcPlayer killed;
 
-    public CvcPlayerKillEvent(CvcPlayer player, WeaponType weaponType, boolean isHeadshot,
-            long atSecondsAfterRoundStart) {
+    private WeaponType weaponType;
+    private OtherType otherType;
+    private boolean isHeadshot;
+    private long atMillisAfterRoundStart;
+
+    public CvcPlayerKillEvent(CvcPlayer player, CvcPlayer killed, WeaponType weaponType,
+            OtherType otherType, boolean isHeadshot, long atMillisAfterRoundStart) {
         super(player);
 
         this.weaponType = weaponType;
+        this.killed = killed;
+        this.otherType = otherType;
         this.isHeadshot = isHeadshot;
-        this.atSecondsAfterRoundStart = atSecondsAfterRoundStart;
+        this.atMillisAfterRoundStart = atMillisAfterRoundStart;
     }
 
     public WeaponType getWeaponType() {
@@ -29,7 +35,15 @@ public class CvcPlayerKillEvent extends CvcPlayerEvent {
         return isHeadshot;
     }
 
-    public long getAtSecondsAfterRoundStart() {
-        return atSecondsAfterRoundStart;
+    public long getAtMillisAfterRoundStart() {
+        return atMillisAfterRoundStart;
+    }
+
+    public OtherType getOtherType() {
+        return otherType;
+    }
+
+    public CvcPlayer getKilled() {
+        return killed;
     }
 }
