@@ -53,11 +53,6 @@ public class CvcScoreboardManager implements CvcEventListener {
      * @param player the player
      */
     public void detectPlayer(CvcPlayer player) {
-        if (player.getUuid().equals(
-                CvcAddonManager.getInstance().get().getPlayerListAdapter().getCurrentUUID())) {
-            ChatUtil.log("detected current player");
-        }
-
         // try init the player if he is not dirty (aka has not been init)
         player.init();
 
