@@ -43,6 +43,13 @@ public class CvcRoundManager implements CvcEventListener {
         return this.rounds;
     }
 
+    public long getLastRoundStart() {
+        if (this.hasRound()) {
+            return this.getRound().getStartedAt();
+        }
+        return -1;
+    }
+
     /**
      * Called by sound handler when there is a new round
      */

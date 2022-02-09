@@ -6,9 +6,14 @@ import de.throwstnt.developing.labymod.cvc.api.data.stats.OtherType;
 import de.throwstnt.developing.labymod.cvc.api.data.stats.WeaponType;
 import de.throwstnt.developing.labymod.cvc.api.events.CvcEventHandler;
 import de.throwstnt.developing.labymod.cvc.api.events.CvcEventListener;
+import de.throwstnt.developing.labymod.cvc.api.events.CvcEventManager;
 import de.throwstnt.developing.labymod.cvc.api.events.minecraft.CvcMinecraftChatMessageEvent;
+import de.throwstnt.developing.labymod.cvc.api.events.player.CvcPlayerDeathEvent;
+import de.throwstnt.developing.labymod.cvc.api.events.player.CvcPlayerDeathEvent.DeathReason;
+import de.throwstnt.developing.labymod.cvc.api.events.player.CvcPlayerKillEvent;
 import de.throwstnt.developing.labymod.cvc.api.game.CvcPlayer;
 import de.throwstnt.developing.labymod.cvc.api.game.managers.CvcPlayerManager;
+import de.throwstnt.developing.labymod.cvc.api.game.managers.CvcRoundManager;
 import de.throwstnt.developing.labymod.cvc.api.util.ChatUtil;
 import de.throwstnt.developing.labymod.cvc.api.util.SymbolLibrary;
 
@@ -80,28 +85,20 @@ public class CvcMessagesHandler implements CvcEventListener {
         CvcPlayer other = CvcPlayerManager.getInstance().getPlayer(otherName);
 
         if (killer != null && other != null) {
-            killer.getGameStats().setKills(killer.getGameStats().getKills() + 1);
+            isHeadshot = isHeadshot || (weaponType != null && weaponType == WeaponType.KNIFE)
+                    || OtherType.isGrenade(otherType);
 
-            if (isHeadshot || weaponType == WeaponType.KNIFE || OtherType.isGrenade(otherType)) {
-                // we add a headshot either if we know it is, if it's a knife or a grenade kill
-                killer.getGameStats().setHeadshots(killer.getGameStats().getHeadshots() + 1);
-            }
+            CvcEventManager.getInstance()
+                    .fireEvent(new CvcPlayerKillEvent(killer, other, weaponType, otherType,
+                            isHeadshot, System.currentTimeMillis()
+                                    - CvcRoundManager.getInstance().getLastRoundStart()));
 
-            killer.getGameStats().getWeaponStats().stream()
-                    .filter(weaponStat -> weaponStat.type == weaponType).forEach(weaponStat -> {
-                        weaponStat.kills++;
-
-                        if (isHeadshot || weaponStat.type == WeaponType.KNIFE) {
-                            weaponStat.headshots++;
-                        }
-                    });
-            // update all virtuals (including weapons)
-            killer.getGameStats().updateVirtuals();
-
-            other.getGameStats().setDeaths(other.getGameStats().getDeaths() + 1);
-            other.getGameStats().updateVirtuals();
-
-            other.updateState(CvcPlayer.State.DEAD);
+            CvcEventManager.getInstance()
+                    .fireEvent(new CvcPlayerDeathEvent(other, killer, DeathReason.ENEMY, weaponType,
+                            otherType, isHeadshot, System.currentTimeMillis()
+                                    - CvcRoundManager.getInstance().getLastRoundStart()));
+        } else {
+            ChatUtil.log("Couldn't find a cvc player for " + killerName + " or " + otherName);
         }
     }
 
@@ -109,28 +106,11 @@ public class CvcMessagesHandler implements CvcEventListener {
         CvcPlayer other = CvcPlayerManager.getInstance().getPlayer(otherName);
 
         if (other != null) {
-            other.getGameStats().setDeaths(other.getGameStats().getDeaths() + 1);
-            other.getGameStats().updateVirtuals();
-
-            other.updateState(CvcPlayer.State.DEAD);
+            CvcEventManager.getInstance()
+                    .fireEvent(new CvcPlayerDeathEvent(other, null, DeathReason.SELF, null,
+                            otherType, true, System.currentTimeMillis()
+                                    - CvcRoundManager.getInstance().getLastRoundStart()));
         }
-    }
-
-    @SuppressWarnings("resource")
-    private static void addDeath(String otherName, WeaponType weaponUsed) {
-        /*
-         * CvcPlayer other = GameManager.getInstance().getGame().getPlayerFromName(otherName);
-         * 
-         * if (other != null) { if (Minecraft.getInstance().player.getGameProfile().getId() == other
-         * .getIdentification()) { ModuleStatsManager.getInstance()
-         * .setInGameDeaths(ModuleStatsManager.getInstance().getInGameDeaths() + 1); }
-         * 
-         * InGameStats otherStats = other.getInGameStats();
-         * 
-         * otherStats.setDeaths(otherStats.getDeaths() + 1); otherStats.update();
-         * 
-         * other.setState(CvcPlayer.State.DEAD); }
-         */
     }
 
 }

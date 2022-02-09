@@ -7,4 +7,8 @@ public class CvcRound {
     public CvcRound() {
         this.startedAt = System.currentTimeMillis();
     }
+
+    public long getStartedAt() {
+        return startedAt;
+    }
 }

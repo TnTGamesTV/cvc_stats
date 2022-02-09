@@ -11,6 +11,7 @@ import de.throwstnt.developing.labymod.cvc.api.events.CvcEventListener;
 import de.throwstnt.developing.labymod.cvc.api.events.CvcEventManager;
 import de.throwstnt.developing.labymod.cvc.api.events.game.CvcStateChangeEvent;
 import de.throwstnt.developing.labymod.cvc.api.game.CvcPlayer;
+import de.throwstnt.developing.labymod.cvc.api.game.handlers.CvcMessagesHandler;
 import de.throwstnt.developing.labymod.cvc.api.game.handlers.CvcSoundHandler;
 import de.throwstnt.developing.labymod.cvc.api.game.managers.CvcAddonManager;
 import de.throwstnt.developing.labymod.cvc.api.game.managers.CvcGameManager;
@@ -75,6 +76,7 @@ public abstract class AbstractCvcStats<GameProfileType, PacketBufferType, Render
         CvcEventManager.getInstance().registerListeners(CvcPlayerManager.getInstance());
         CvcEventManager.getInstance().registerListeners(CvcScoreboardManager.getInstance());
         CvcEventManager.getInstance().registerListeners(CvcStatsManager.getInstance());
+        CvcEventManager.getInstance().registerListeners(CvcMessagesHandler.getInstance());
         CvcEventManager.getInstance().registerListeners(this);
     }
 

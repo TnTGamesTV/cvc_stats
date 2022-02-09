@@ -150,25 +150,42 @@ public class CvcPlayer implements CvcEventListener {
     }
 
     public void onKill(CvcPlayerKillEvent event) {
-        CvcWeaponGameStats weaponStat = this.gameStats.getWeaponStats().stream()
-                .filter(filteredWeaponStat -> filteredWeaponStat.type.equals(event.getWeaponType()))
+        // player killed someone
+        if (event.getWeaponType() != null) {
+            // is actually a gun or knife
+            CvcWeaponGameStats weaponStat = this.gameStats.getWeaponStats().stream().filter(
+                    filteredWeaponStat -> filteredWeaponStat.type.equals(event.getWeaponType()))
                 .findFirst().orElse(null);
 
+            if (weaponStat != null) {
         weaponStat.kills++;
+
+                if (event.isHeadshot()) {
+                    weaponStat.headshots++;
+                }
+            }
+        }
+
+        // set the game kills (and maybe headshots)
         this.gameStats.setKills(this.gameStats.getKills() + 1);
 
         if (event.isHeadshot()) {
-            this.gameStats.setHeadshots(this.gameStats.getHeadshots());
-            weaponStat.headshots++;
+            this.gameStats.setHeadshots(this.gameStats.getHeadshots() + 1);
         }
+
+        // update the virtuals
+        this.gameStats.updateVirtuals();
 
         CvcEventManager.getInstance().fireEvent(new CvcGameStatsChangedEvent(this, this.gameStats));
     }
 
     public void onDeath(CvcPlayerDeathEvent event) {
         this.gameStats.setDeaths(this.gameStats.getDeaths() + 1);
+        this.gameStats.updateVirtuals();
 
         CvcEventManager.getInstance().fireEvent(new CvcGameStatsChangedEvent(this, this.gameStats));
+
+        this.updateState(State.DEAD);
     }
 
     public void onTeamChanged(CvcPlayerTeamChangedEvent event) {
